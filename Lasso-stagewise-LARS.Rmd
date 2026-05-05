@@ -1,0 +1,44 @@
+---
+title: "Untitled"
+output: html_document
+date: "2026-05-05"
+---
+
+# Modificaciones del algoritmo LARS.
+
+Esta sección describe modificaciones simples del algoritmo LARS que producen estimaciones de tipo Lasso o Stagewise.
+
+## La relación LARS-Lasso.
+
+La regresión Lasso estima los coeficientes minimizando $\left\| Y-X\beta\right\|^{2},$ sujeta a $\left\| \beta\right\|_1=\sum_{j=1}^{k}|\beta_{j}|$ .
+
+Para que LARS reproduzca el comportamiento de Lasso, se debe cumplir la siguiente condición de optimalidad: Sea $\hat{\beta}$ una solución Lasso. Entonces $\text{sign}(\hat{\beta}_{j})=\text{sign}(\hat{c}_{j})=s_{j}$.
+
+Supongamos que el algoritmo se encuentra en una etapa dada con un conjunto activo $\mathcal{A}$ y una estimación actual $\hat{\beta}$. La iteracion del algoritmo modificado procede de la siguiente manera:
+
+1.  Se calcula el tamaño de paso $\hat{\gamma}$ necesario para que una variable inactiva $(j\in\mathcal{A}^{c})$ alcance la correlación máxima actual y sea candidata a ingresar al conjunto activo.
+
+2.  Definimos $d_{j}=s_{j}\left[k_{\mathcal{A}}\left(X_{\mathcal{A}}^{\top}X_{\mathcal{A}}\right)^{-1}1_{|\mathcal{A}|} \right]_{j} \text{ para } j\in\mathcal{A}$. Moviéndonos en la dirección positiva $\gamma$ a lo largo de la línea LARS, se tiene que $\beta_{j}(\gamma)=\hat{\beta}_{j}+\gamma d_{j}$.
+
+3.  Se evalúa en que momento exacto $\gamma$ cada coeficiente activo cruzaría el valor de cero. Esto ocurre cuando $\hat{\beta}_{j}+\gamma_{j}d_{j}=0$ o equivalentemente
+
+    $$\gamma_{j}=-\frac{\hat{\beta}_{j}}{d_{j}}.$$
+
+4.  El primer cambio de signo ocurre en
+
+    $\widetilde{\gamma}=\min_{\gamma_{j}>0}\left\{ \gamma_{j}\right\}$,
+
+    para alguna covariable $x_{\widetilde{j}}$; $\widetilde{\gamma}$ es infinito por definición si no existe ningún $\gamma_{j}>0$.
+
+5.  Si $\hat{\gamma}\leq \widetilde{\gamma}$, entonces ningún coeficiente activo cambia de signo antes de que ingrese una variable. En este caso el algoritmo para este paso es el del LARS.
+
+    Si $\widetilde{\gamma}<\hat{\gamma}$, entonces avanzar la magnitud total $\hat{\gamma}$ implicaría que el coeficiente $\beta_{\widetilde{j}}$ cruce el cero, violando la restricción Lasso. Por lo tanto, se detiene el paso LARS en curso en $\gamma=\widetilde{\gamma}$ y eliminar $\widetilde{j}$ del calculo de la siguiente dirección equiangular. Es decir,
+
+    $$
+    \hat{y}_{\mathcal{A}}\leftarrow \hat{y}_{\mathcal{A}}+\widetilde{\gamma}u_{\mathcal{A}}\quad
+    \quad \text{ y }\quad\quad \mathcal{A}\leftarrow\mathcal{A}-\left\{ \widetilde{j}\right\}.
+    $$
+
+**Teorema. Bajo la modificación Lasso, y suponiendo la condición de ''uno a la vez'', el algoritmo LARS produce todas las soluciones Lasso.**
+
+Los conjunto activos $\mathcal{A}$ crecen de manera monótona a medida que el algoritmo LARS original progresa, pero la modificación Lasso permite que $\mathcal{A}$ también disminuya. ''Uno a la vez'' significa que los incrementos y decrementos nunca involucran más de un único índice $j$. Este es el caso usual para datos cuantitativos y siempre puede lograrse añadiendo una pequeña perturbación a los valores de $y$.

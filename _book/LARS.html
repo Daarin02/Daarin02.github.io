@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.6.42">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>2&nbsp; Regresión por menor ángulo (LARS) – Regresión por menor ángulo (LARS)</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./LARS-mod.html" rel="next">
+<link href="./intro.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-2f5df379a58b258e96c21c0638c20c03.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-8da5b4427184b79ecddefad3d342027e.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "Sin resultados",
+    "search-matching-documents-text": "documentos encontrados",
+    "search-copy-link-title": "Copiar el enlace en la búsqueda",
+    "search-hide-matches-text": "Ocultar resultados adicionales",
+    "search-more-match-text": "resultado adicional en este documento",
+    "search-more-matches-text": "resultados adicionales en este documento",
+    "search-clear-button-title": "Borrar",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancelar",
+    "search-submit-button-title": "Enviar",
+    "search-label": "Buscar"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Alternar barra lateral" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./LARS.html"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Regresión por menor ángulo (LARS)</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Alternar barra lateral" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Buscar" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">Regresión por menor ángulo (LARS)</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Buscar"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Presentación</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./intro.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Preliminares</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./LARS.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Regresión por menor ángulo (LARS)</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./LARS-mod.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Modificaciones del algoritmo LARS.</span></span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Tabla de contenidos</h2>
+   
+  <ul>
+  <li><a href="#intuición-detrás-de-lars" id="toc-intuición-detrás-de-lars" class="nav-link active" data-scroll-target="#intuición-detrás-de-lars"><span class="header-section-number">2.1</span> Intuición detrás de LARS</a></li>
+  <li><a href="#algoritmo-lars-en-el-caso-general" id="toc-algoritmo-lars-en-el-caso-general" class="nav-link" data-scroll-target="#algoritmo-lars-en-el-caso-general"><span class="header-section-number">2.2</span> Algoritmo LARS en el caso general</a></li>
+  <li><a href="#con-qué-subconjunto-nos-quedamos" id="toc-con-qué-subconjunto-nos-quedamos" class="nav-link" data-scroll-target="#con-qué-subconjunto-nos-quedamos"><span class="header-section-number">2.3</span> Con qué subconjunto nos quedamos?</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Regresión por menor ángulo (LARS)</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="intuición-detrás-de-lars" class="level2" data-number="2.1">
+<h2 data-number="2.1" class="anchored" data-anchor-id="intuición-detrás-de-lars"><span class="header-section-number">2.1</span> Intuición detrás de LARS</h2>
+<p>Notemos que la regresión por pasos tiene la ventaja de que llega a una solución en a lo más <span class="math inline">\(\min\{n,p\}\)</span> pasos, pero como mencionamos antes, como añadimos “mucho” de un predictor en cada iteración, podemos, sin darnos cuenta, eliminar alguno que fuera relevante. El algoritmo regresión por etapas intenta resolver este problema, pero al costo de introducir muchas iteraciones. El objetivo de el algoritmo de regresión por menor ángulo es obtener los beneficios de ambos realizando decisiones “inteligente” de que predictores añadimos en cada paso y “cuanto” añadimos de cada uno.</p>
+<p>Al igual que en los dos algoritmos anteriores, la idea es añadir predictores hasta que estemos satisfechos. Tomemos primero el caso donde</p>
+<p><span class="math display">\[
+X=\begin{bmatrix}
+x_{1,1}&amp;x_{1,2}\\
+x_{2,1}&amp;x_{2,2}
+\end{bmatrix}.
+\]</span></p>
+<p>Supongamos que <span class="math inline">\(|\langle x_1,y\rangle|&gt;|\langle x_2,y\rangle|\)</span>, de manera que si <span class="math inline">\(\theta_1\)</span> es el ángulo entre <span class="math inline">\(x_1, y\)</span> y <span class="math inline">\(\theta_2\)</span> es el ángulo entre <span class="math inline">\(x_2,y\)</span>, entonces</p>
+<p><span class="math display">\[
+|\cos(\theta_1)|~||y||=|\langle x_1,y\rangle|&gt;|\langle x_2,y\rangle|=|\cos(\theta_2)|~||y||\Rightarrow |\cos(\theta_1)|&gt;|\cos(\theta_2)|.
+\]</span></p>
+<p>Esto nos dice que <span class="math inline">\(|\cos(\theta_1)|\)</span> está más cercano a 1, y por tanto, como <span class="math inline">\(\cos(0)=\cos(\pi)=1\)</span>, se tiene que si consideramos la recta marcada por <span class="math inline">\(y\)</span>, entonces el ángulo formado por <span class="math inline">\(x_1\)</span> y dicha recta es más pequeño que el formado por <span class="math inline">\(x_2\)</span>, como se observa en la <a href="#fig-LARS" class="quarto-xref">Figura&nbsp;<span class="quarto-unresolved-ref">fig-LARS</span></a>, de modo que damos un paso en esta dirección (considerando el signo que tiene <span class="math inline">\(\langle x_1,y\rangle\)</span>). Ahora bien, vamos a dar un tamaño de paso muy especial. Como el algoritmo termina en el siguiente paso y queremos llegar a la solución usual de mínimos cuadrados, consideramos un tamaño de paso <span class="math inline">\(\hat\gamma_1\)</span> de manera que si <span class="math inline">\(\hat y\)</span> es dicho estimador, entonces <span class="math inline">\(\hat y-\hat\gamma_1 x_1\)</span> biseque el ángulo entre <span class="math inline">\(x_1\)</span> y <span class="math inline">\(x_2\)</span>, esto es que <span class="math inline">\(\hat y-\hat\gamma_1 x_1\)</span> tenga la misma correlación con <span class="math inline">\(x_1\)</span> y <span class="math inline">\(x_2\)</span>, de manera que nuestra estimación actual es <span class="math inline">\(\hat\gamma_1 x_1\)</span>. Después, continuamos en la dirección marcada por dicha bisectriz, específicamente, si <span class="math inline">\(u_2\)</span> es el vector unitario que biseca dicho ángulo, entonces nuestra siguiente estimación es <span class="math inline">\(\hat\gamma_1 x_1+\hat\gamma_2 u_2\)</span>, donde <span class="math inline">\(\hat\gamma_2\)</span> es elegido para que la estimación final sea <span class="math inline">\(\hat y\)</span>.</p>
+<div id="fig-LARS" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-LARS-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="LARS.png" class="img-fluid quarto-figure quarto-figure-center figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-LARS-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figura&nbsp;2.1: Representación gráfica de LARS en dos dimensiones con 2 covariables.
+</figcaption>
+</figure>
+</div>
+<p>Notemos que el algoritmo por pasos hubiera elegido <span class="math inline">\(\hat\gamma_1=\hat\beta_1\)</span>, mientas que el algoritmo por etapas hubiera seguido un camino escalonado a partir de <span class="math inline">\(\hat\gamma_1 x_1\)</span> para llegar a <span class="math inline">\(\hat y\)</span>, mientras de que LARS elige un camino intermedio.</p>
+</section>
+<section id="algoritmo-lars-en-el-caso-general" class="level2" data-number="2.2">
+<h2 data-number="2.2" class="anchored" data-anchor-id="algoritmo-lars-en-el-caso-general"><span class="header-section-number">2.2</span> Algoritmo LARS en el caso general</h2>
+<p>Como vimos antes, para dos vectores, el algoritmo toma la dirección de la bisectriz entre ellos. Podemos generalizar este concepto para más vectores:</p>
+<div id="def-equia" class="border rounded shadow-sm p-3 mb-3 theorem definition">
+<p><span class="theorem-title"><strong>Definición 2.1 (Vector equiangular)</strong></span> Sean <span class="math inline">\(\{x_1,\dots, x_r\}\)</span> vectores y <span class="math inline">\(X\)</span> la matriz cuyas columnas son dichos vectores. Decimos que un vector <span class="math inline">\(u\)</span> es equiangular a los vectores <span class="math inline">\(\{x_1,\dots, x_r\}\)</span> si</p>
+<p><span class="math display">\[ X^T u=\begin{bmatrix} \alpha\\ \vdots\\ \alpha \end{bmatrix}, \]</span></p>
+<p>para alguna constante <span class="math inline">\(\alpha\)</span>.</p>
+</div>
+<p>Es natural preguntarse cuando podemos encontrar vectores equiangulares, para ello tenemos el siguiente resultado:</p>
+<div id="thm-exis" class="border rounded shadow-sm p-3 mb-3 theorem">
+<p><span class="theorem-title"><strong>Teorema 2.1 (Existencia de vectores equiangulares)</strong></span> Supongamos que <span class="math inline">\(\{x_1,\dots, x_n\}\)</span> son linealmente independientes. Entonces, existe un vector equiangular a dichos vectores que además es unitario.</p>
+</div>
+<div class="callout callout-style-simple callout-important no-icon callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Demostración
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Sea <span class="math inline">\(W\)</span> la matriz con columnas <span class="math inline">\(\{x_1,\dots, x_r\}\)</span>. Notemos que trivialmente se cumple que <span class="math inline">\(I\mathbf 1_n=\mathbf 1_n\)</span>, de manera que</p>
+<p><span class="math display">\[ (W^TW)(W^TW)^{-1}\mathbf 1_n=\mathbf 1_n. \]</span></p>
+<p>Así, si hacemos <span class="math inline">\(u'=W(W^TW)^{-1}\mathbf 1_n\)</span>, entonces tenemos un múltiplo del vector <span class="math inline">\(u\)</span> buscado. Además, como</p>
+<p><span class="math display">\[ \begin{aligned} ||u'||^2&amp;=\mathbf 1_n(W^TW)^{-1} W^TW(W^TW)^{-1}\mathbf 1_n\\ &amp;=\mathbf 1_n(W^TW)^{-1}\mathbf 1_n \end{aligned}, \]</span></p>
+<p>se tiene que</p>
+<p><span class="math display">\[ u=\frac{W(W^TW)^{-1}\mathbf 1_n}{[\mathbf 1_n (W^TW)^{-1}\mathbf 1_n]^{\frac 12}},
+\]</span></p>
+<p>es un vector equiangular y además notemos que en este caso <span class="math inline">\(\alpha=[\mathbf 1_n(W^TW)^{-1}\mathbf 1_n]^{-\frac 12}&gt;0\)</span>.</p>
+</div>
+</div>
+</div>
+<p>Con esto, podemos describir nuestro algoritmo. Sea <span class="math inline">\(\hat y_{\mathcal A}\)</span> nuestra estimación actual, donde <span class="math inline">\(\mathcal A\subseteq \{1,\dots, \min\{n,p\}\}\)</span> nos indica los ínidices que los predictores que hemos agregado. Si <span class="math inline">\(c_\mathcal A=X^T(y-\hat y_{\mathcal A})\)</span> es el vector de correlaciones parciales <a href="#eq-corrpa" class="quarto-xref">Ecuación&nbsp;<span class="quarto-unresolved-ref">eq-corrpa</span></a>, definimos</p>
+<p><span class="math display">\[
+\hat C_\mathcal A=\hat C=\max_j\{|c_j|\},\quad \mathcal A=\{j:|c_j|=\hat C\},
+\]</span>y también</p>
+<p><span class="math display">\[
+s_j=\text{sign}(c_j),\quad j\in \mathcal A.
+\]</span></p>
+<p>Con esto, definimos la matriz</p>
+<p><span class="math display">\[ X_{\mathcal A}=(\cdots s_jx_j\cdots)_{j\in \mathcal A}, \]</span></p>
+<p>donde las columnas están ordenadas de acuerdo a como van entrando predictores. Con esto, consideremos el vector del <a href="#thm-exis" class="quarto-xref">Teorema&nbsp;<span class="quarto-unresolved-ref">thm-exis</span></a></p>
+<p><span id="eq-ua"><span class="math display">\[ u_\mathcal A =\frac{X_\mathcal A(X^T_{\mathcal A} X_{\mathcal A})^{-1}\mathbf 1_{|\mathcal A|}}{[\mathbf 1_{|\mathcal A|}(X_{\mathcal A}^TX_{\mathcal A})^{-1}\mathbf 1_{|\mathcal A|}]^{\frac 12}},  \tag{2.1}\]</span></span></p>
+<p>que es equiangular con <span class="math inline">\(\{s_jx_j\}_{j\in \mathcal A}\)</span> y unitario. Tenemos entonces la dirección que seguimos en nuestro siguiente paso, resta ver la magnitud con la que aumentamos. Primeramente notemos que si <span class="math inline">\(\gamma&gt;0\)</span> y definimos</p>
+<p><span id="eq-corrlars"><span class="math display">\[
+c_j(\gamma)=x_j^T(y-\hat y_\mathcal A -\gamma u_\mathcal A)=c_j-\gamma\langle x_j,u_\mathcal A\rangle=c_j-\gamma s_jk_{\mathcal A},
+\tag{2.2}\]</span></span></p>
+<p>donde <span class="math inline">\(k_{\mathcal A}=[\mathbf 1_{|\mathcal A|}(X^T_{\mathcal A}X_{\mathcal A})^{-1}\mathbf 1_{|\mathcal A|}]^{-\frac 12}&gt;0\)</span> . Entonces, para <span class="math inline">\(j\in \mathcal A\)</span> se tiene que</p>
+<p><span id="eq-clave"><span class="math display">\[
+|c_j(\gamma)|=|s_j \hat C-\gamma s_jk_{\mathcal A}|= \hat C-\gamma k_{\mathcal A},
+\tag{2.3}\]</span></span></p>
+<p>para <span class="math inline">\(\gamma\leq \frac{\hat C}{k_\mathcal A}\)</span>. La ecuación anterior es la clave para el algortimo funcione, esta nos dice que para valores pequeños de <span class="math inline">\(\gamma\)</span>, <span class="math inline">\(|c_j(\gamma)|\)</span> decrece de manera lineal para <span class="math inline">\(j\in \mathcal A\)</span>. Además, para <span class="math inline">\(j\notin \mathcal A\)</span>, si <span class="math inline">\(c_j\geq 0\)</span> y <span class="math inline">\(\gamma\leq \frac{c_j}{k_\mathcal A}\)</span>, entonces</p>
+<p><span class="math display">\[
+|c_j(\gamma)|=c_j-\gamma k_{\mathcal A}\leq \hat C-\gamma k_{\mathcal A},
+\]</span></p>
+<p>y si <span class="math inline">\(c_j&lt;0\)</span> y <span class="math inline">\(\gamma\leq \frac{-c_j}{k_{\mathcal A}}\)</span> , entonces</p>
+<p><span class="math display">\[
+|c_j(\gamma)|=-c_j-\gamma k_\mathcal A\leq \hat C-\gamma k_\mathcal A.
+\]</span></p>
+<p>Esto quiere decir que, partiendo de <span class="math inline">\(\gamma=0\)</span>, las correlaciones absolutas para <span class="math inline">\(j\notin \mathcal A\)</span> son menores que las de <span class="math inline">\(j\in \mathcal A\)</span> y estas últimas decrecen de manera constante. Nos interesa entonces el valor no negativo más pequeño <span class="math inline">\(\hat \gamma\)</span> en tal que se cumpla la igualdad que se obtiene al igualar el lado derecho de <a href="#eq-clave" class="quarto-xref">Ecuación&nbsp;<span class="quarto-unresolved-ref">eq-clave</span></a> y <a href="#eq-corrlars" class="quarto-xref">Ecuación&nbsp;<span class="quarto-unresolved-ref">eq-corrlars</span></a>:</p>
+<p><span id="eq-gamma"><span class="math display">\[
+|c_j(\gamma)|=|c_j-\gamma s_j k_\mathcal A|=\hat C-\gamma k_\mathcal A,\quad j\notin \mathcal A.
+\tag{2.4}\]</span></span></p>
+<p>En la <a href="#fig-gamma" class="quarto-xref">Figura&nbsp;<span class="quarto-unresolved-ref">fig-gamma</span></a> podemos ver como encontramos gráficamente el valor de <span class="math inline">\(\hat\gamma\)</span>.</p>
+<div id="fig-gamma" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-gamma-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="gamma.png" class="img-fluid quarto-figure quarto-figure-center figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-gamma-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figura&nbsp;2.2: Correlaciones de las variables en A vs correlaciones de las variables que no están en A.
+</figcaption>
+</figure>
+</div>
+<p>Tenemos de la <a href="#eq-gamma" class="quarto-xref">Ecuación&nbsp;<span class="quarto-unresolved-ref">eq-gamma</span></a> que</p>
+<p><span id="eq-gammareal"><span class="math display">\[
+\hat\gamma=\min^+_{j\in \mathcal A^C}\left\{\frac{\hat C-c_j}{k_\mathcal A-s_jk_\mathcal A},\frac{\hat C+c_j}{k_\mathcal A+s_jk_\mathcal A}\right\}.
+\tag{2.5}\]</span></span></p>
+<p>donde el mínimo se toma sobre valores no negativos, y notemos que se cumple la <a href="#eq-clave" class="quarto-xref">Ecuación&nbsp;<span class="quarto-unresolved-ref">eq-clave</span></a> con <span class="math inline">\(\hat\gamma\)</span> pues si <span class="math inline">\(c_j\geq 0\)</span>, entonces <span class="math inline">\(s_j=1\)</span> y por tanto</p>
+<p><span class="math display">\[
+\hat C+c_j\leq 2 k_\mathcal A\frac{\hat C}{k_\mathcal A}\Rightarrow \frac{\hat C+c_j}{k_\mathcal A+s_jk_\mathcal A}\leq \frac{\hat C}{k_\mathcal A},
+\]</span></p>
+<p>y si <span class="math inline">\(c_j\leq 0\)</span>, entonces <span class="math inline">\(s_j=-1\)</span> y por tanto</p>
+<p><span class="math display">\[
+\hat C-c_j\leq 2 k_\mathcal A\frac{\hat C}{k_\mathcal A}\Rightarrow \frac{\hat C-c_j}{k_\mathcal A-s_jk_\mathcal A}\leq \frac{\hat C}{k_\mathcal A}.
+\]</span></p>
+<p>Así, de manera compacta tenemos que nuestro algoritmo se actualiza a</p>
+<p><span class="math display">\[
+\mathcal A\longleftarrow \mathcal A\cup\{\hat j\},\quad \hat C\longleftarrow  \hat C-\hat\gamma k_{\mathcal A},\quad \hat y_{\mathcal A}\longleftarrow \hat y_\mathcal A+\hat\gamma u_\mathcal A,
+\]</span>donde <span class="math inline">\(\hat j\)</span> es el <span class="math inline">\(\arg\min\)</span> en la <a href="#eq-gammareal" class="quarto-xref">Ecuación&nbsp;<span class="quarto-unresolved-ref">eq-gammareal</span></a>.</p>
+<p>Lo anterior está bien definido para cada etapa del algoritmo salvo en el último paso, pues al final <span class="math inline">\(\mathcal A^c=\varnothing\)</span>. El objetivo final del algoritmo es recuperar la solución de mínimos cuadrados. Supongamos que tenemos la estimación actual <span class="math inline">\(\hat y_\mathcal A\)</span> y sea <span class="math inline">\(\overline y_\mathcal A\)</span> la solución de mínimos cuadrados actual. Entonces,</p>
+<p><span class="math display">\[
+\overline y_\mathcal A=\hat y_\mathcal A+X_\mathcal A(X_\mathcal A^TX_\mathcal A)^{-1}X_\mathcal A^T(y-\hat y_\mathcal A)=\hat y_\mathcal A+\frac{\hat C_\mathcal A}{k_\mathcal A}u_\mathcal A,
+\]</span>pues <span class="math inline">\(\hat y_\mathcal A\)</span> por construcción está en el espacio generado por los vectores <span class="math inline">\(\{x_i\}_{i\in \mathcal A}\)</span> y recordando la <a href="#eq-ua" class="quarto-xref">Ecuación&nbsp;<span class="quarto-unresolved-ref">eq-ua</span></a>. Como <span class="math inline">\(u_\mathcal A\)</span> es unitario, se cumple que</p>
+<p><span class="math display">\[
+||\hat y_\mathcal A-\overline y_\mathcal A||=\frac{\hat C_\mathcal A}{k_\mathcal A},
+\]</span>entonces nunca llegamos a la solución de mínimos cuadrados, y si queremos llegar a ella al final, requerimos que en la última iteración,</p>
+<p><span class="math display">\[
+\hat\gamma=\frac{\hat C_\mathcal A}{k_\mathcal A},\quad \mathcal A=\{1,\dots, \min\{n,p\}\}.
+\]</span></p>
+<p>Esto describe completamente a nuestro algoritmo.</p>
+</section>
+<section id="con-qué-subconjunto-nos-quedamos" class="level2" data-number="2.3">
+<h2 data-number="2.3" class="anchored" data-anchor-id="con-qué-subconjunto-nos-quedamos"><span class="header-section-number">2.3</span> Con qué subconjunto nos quedamos?</h2>
+<p>Si <span class="math inline">\(n&lt;p\)</span> nuestro algoritmo se detiene cuando ha añadido <span class="math inline">\(n\)</span> variables. Sin embargo, cuando <span class="math inline">\(p\geq n\)</span> nuestro lagoritmo no se detiene hasta añadir todas las variables. Veamos ahora un criterio que nos ayuda a elegir un subconjunto apropiado de variables para nuestro modelos.</p>
+<div id="def-Cp" class="theorem definition">
+<p><span class="theorem-title"><strong>Definición 2.2 (Estadístico <span class="math inline">\(C_p\)</span>)</strong></span> Para el modelo de regresión lineal usual <a href="#eq-modelo" class="quarto-xref">Ecuación&nbsp;<span class="quarto-unresolved-ref">eq-modelo</span></a>, si <span class="math inline">\(\mu=X\beta\)</span> es el vector de medias de <span class="math inline">\(y\)</span>, definimos para un ajuste <span class="math inline">\(\hat y\)</span> el estadístico,</p>
+<p><span class="math display">\[
+C_p(\hat y)=\mathbb E\left[\frac{||\hat y-\mu||^2}{\sigma^2}\right],
+\]</span>que no es más que el valor esperado del error de predicción escalado con la varianza.</p>
+</div>
+<p>Notemos que la suma de cuadrados residuales siempre se hace más pequeña mientras más variables agregamos a nuestro modelo, mientras que nuestro estadístico <span class="math inline">\(C_p\)</span> no tiene por que. Ahora bien, notemos que para <span class="math inline">\(1\leq i\leq n\)</span> podemos escribir</p>
+<p><span class="math display">\[
+(\hat y_i-\mu_i)^2=(y_i-\hat y_i)^2-(y_i-\mu_i)^2+2(\hat y_i-\mu_i)(y_i-\mu_i),
+\]</span> de manera que</p>
+<p><span class="math display">\[
+C_p(\hat y)=\mathbb E\left[\frac{||y-\hat y||^2}{\sigma^2}\right]-n+2\sum_{i=1}^n\frac{\text{Cov}(\hat y_i,y_i)}{\sigma^2}.
+\]</span></p>
+<p>Usualmente no conocemos la varianza, por lo que podemos reemplazar lo anterior con su estimador insesgado del modelo completo. Más aún, se puede probar que bajo ciertas condiciones se tiene que</p>
+<p><span class="math display">\[
+C_p(\hat y_k)=\mathbb E\left[\frac{||y-\hat y_k||^2}{\hat\sigma^2}\right]-n+2k,
+\]</span>donde <span class="math inline">\(\hat y_k\)</span> es el estimador en el <span class="math inline">\(k\)</span>-ésimo paso de nuestro algoritmo, y aunque no se tenga la igualdad, esta es una buena aproximación para el estimador. Nos interesa entonces encontrar el paso de nuestro algoritmo donde se minimice este estadístico.</p>
+<div class="callout callout-style-simple callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Ejemplo
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Consideremos de nuevo nuestra base de datos de diabetes. Al realizar la regresión obtenemos los siguientes caminos para <span class="math inline">\(\beta\)</span>.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Código</summary>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"lars"</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stderr">
+<pre><code>Loaded lars 1.3</code></pre>
+</div>
+<details class="code-fold">
+<summary>Código</summary>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(diabetes)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>X <span class="ot">=</span> diabetes<span class="sc">$</span>x</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>y <span class="ot">=</span> diabetes<span class="sc">$</span>y</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>res <span class="ot">=</span> <span class="fu">lars</span>(X, y, <span class="at">type =</span> <span class="st">"lar"</span>)</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(res, <span class="at">xvar =</span> <span class="st">"step"</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="LARS_files/figure-html/unnamed-chunk-1-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Podemos ver de nuevo que los caminos de <span class="math inline">\(\beta\)</span> obtenidos son muy similares a los de Lasso y regresión por etapas. Ahora bien, también tenemos la siguiente gráfica para los estadísticos <span class="math inline">\(C_p\)</span>.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Código</summary>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">seq</span>(<span class="dv">4</span>,<span class="dv">10</span>,<span class="at">by =</span> <span class="dv">1</span>), res<span class="sc">$</span>Cp[<span class="dv">5</span><span class="sc">:</span><span class="dv">11</span>], <span class="at">type =</span> <span class="st">"o"</span>, <span class="at">xlab =</span> <span class="st">"Step"</span>, <span class="at">ylab =</span> <span class="st">"Cp estimado"</span>, <span class="at">main =</span> <span class="st">"LAR"</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="LARS_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Podemos ver que el <span class="math inline">\(C_p\)</span> estimado más pequeño fue en el paso 7 seguido muy cerca del paso 8, por lo que ambos modelos son considerados plausibles en este caso.</p>
+</div>
+</div>
+</div>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copiado");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copiado");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./intro.html" class="pagination-link" aria-label="Preliminares">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Preliminares</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./LARS-mod.html" class="pagination-link" aria-label="Modificaciones del algoritmo LARS.">
+        <span class="nav-page-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Modificaciones del algoritmo LARS.</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
