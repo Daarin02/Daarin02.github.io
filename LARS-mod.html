@@ -169,6 +169,7 @@ window.Quarto = {
    
   <ul>
   <li><a href="#la-relación-lars-lasso." id="toc-la-relación-lars-lasso." class="nav-link active" data-scroll-target="#la-relación-lars-lasso."><span class="header-section-number">3.1</span> La relación LARS-Lasso.</a></li>
+  <li><a href="#la-relación-lars-stagewise" id="toc-la-relación-lars-stagewise" class="nav-link" data-scroll-target="#la-relación-lars-stagewise"><span class="header-section-number">3.2</span> La relación LARS-Stagewise</a></li>
   </ul>
 </nav>
     </div>
@@ -197,12 +198,15 @@ window.Quarto = {
 <p>Esta sección describe modificaciones simples del algoritmo LARS que producen estimaciones de tipo Lasso o Stagewise.</p>
 <section id="la-relación-lars-lasso." class="level2" data-number="3.1">
 <h2 data-number="3.1" class="anchored" data-anchor-id="la-relación-lars-lasso."><span class="header-section-number">3.1</span> La relación LARS-Lasso.</h2>
-<p>La regresión Lasso estima los coeficientes minimizando <span class="math inline">\(\left\| Y-X\beta\right\|^{2},\)</span> sujeta a <span class="math inline">\(\left\| \beta\right\|_1=\sum_{j=1}^{k}|\beta_{j}|\)</span> .</p>
-<p>Para que LARS reproduzca el comportamiento de Lasso, se debe cumplir la siguiente condición de optimalidad: Sea <span class="math inline">\(\hat{\beta}\)</span> una solución Lasso. Entonces <span class="math inline">\(\text{sign}(\hat{\beta}_{j})=\text{sign}(\hat{c}_{j})=s_{j}\)</span>.</p>
+<p>La regresión Lasso estima los coeficientes minimizando <span class="math inline">\(\left\| Y-X\beta\right\|^{2},\)</span> sujeta a <span class="math inline">\(\left\| \beta\right\|_1=\sum_{j=1}^{k}|\beta_{j}|\leq t, t&gt;0\)</span> .</p>
+<p>Al derivar esta expresión respecto a un coeficiente <span class="math inline">\(\beta_{j}\neq 0\)</span> e igualar a cero para encontrar el mínimo se llega a la condición <span class="math inline">\(-c_{j}+\alpha \text{ sign}(\beta_{j})=0\)</span> . Como <span class="math inline">\(\alpha&gt;0\)</span>, entonces para que la condición anterior se cumpla se necesita que el signo del coeficiente está matemáticamente obligado a coincidir con el signo de su correlación. Esto nos da una condición para LARS:</p>
+<div id="thm-sollasso" class="theorem">
+<p><span class="theorem-title"><strong>Teorema 3.1 (Lema)</strong></span> Sea <span class="math inline">\(\hat \beta\)</span> una solución LASSO. Entonces, para cualquier coeficiente no nulo se debe cumplir que <span class="math inline">\(\text{sign}(\hat\beta_j)=\text{sign}(c_j)=s_j\)</span></p>
+</div>
 <p>Supongamos que el algoritmo se encuentra en una etapa dada con un conjunto activo <span class="math inline">\(\mathcal{A}\)</span> y una estimación actual <span class="math inline">\(\hat{\beta}\)</span>. La iteracion del algoritmo modificado procede de la siguiente manera:</p>
 <ol type="1">
 <li><p>Se calcula el tamaño de paso <span class="math inline">\(\hat{\gamma}\)</span> necesario para que una variable inactiva <span class="math inline">\((j\in\mathcal{A}^{c})\)</span> alcance la correlación máxima actual y sea candidata a ingresar al conjunto activo.</p></li>
-<li><p>Definimos <span class="math inline">\(d_{j}=s_{j}\left[k_{\mathcal{A}}\left(X_{\mathcal{A}}^{\top}X_{\mathcal{A}}\right)^{-1}1_{|\mathcal{A}|} \right]_{j} \text{ para } j\in\mathcal{A}\)</span>. Moviéndonos en la dirección positiva <span class="math inline">\(\gamma\)</span> a lo largo de la línea LARS, se tiene que <span class="math inline">\(\beta_{j}(\gamma)=\hat{\beta}_{j}+\gamma d_{j}\)</span>.</p></li>
+<li><p>Definimos <span class="math inline">\(d_{j}=s_{j}\left[k_{\mathcal{A}}\left(X_{\mathcal{A}}^{\top}X_{\mathcal{A}}\right)^{-1}1_{|\mathcal{A}|} \right]_{j} \text{ para } j\in\mathcal{A}\)</span>. Para <span class="math inline">\(\gamma&gt;0\)</span>, a partir de <span class="math inline">\(\hat{y}(\gamma)=\hat{y}_{\mathcal{A}}+\gamma u_{\mathcal{A}}\)</span> se obtiene que <span class="math inline">\(\beta_{j}(\gamma)=\hat{\beta}_{j}+\gamma d_{j}\)</span>.</p></li>
 <li><p>Se evalúa en que momento exacto <span class="math inline">\(\gamma\)</span> cada coeficiente activo cruzaría el valor de cero. Esto ocurre cuando <span class="math inline">\(\hat{\beta}_{j}+\gamma_{j}d_{j}=0\)</span> o equivalentemente</p>
 <p><span class="math display">\[\gamma_{j}=-\frac{\hat{\beta}_{j}}{d_{j}}.\]</span></p></li>
 <li><p>El primer cambio de signo ocurre en</p>
@@ -212,11 +216,38 @@ window.Quarto = {
 <p>Si <span class="math inline">\(\widetilde{\gamma}&lt;\hat{\gamma}\)</span>, entonces avanzar la magnitud total <span class="math inline">\(\hat{\gamma}\)</span> implicaría que el coeficiente <span class="math inline">\(\beta_{\widetilde{j}}\)</span> cruce el cero, violando la restricción Lasso. Por lo tanto, se detiene el paso LARS en curso en <span class="math inline">\(\gamma=\widetilde{\gamma}\)</span> y eliminar <span class="math inline">\(\widetilde{j}\)</span> del calculo de la siguiente dirección equiangular. Es decir,</p>
 <p><span class="math display">\[ \hat{y}_{\mathcal{A}}\leftarrow \hat{y}_{\mathcal{A}}+\widetilde{\gamma}u_{\mathcal{A}}\quad \quad \text{ y }\quad\quad \mathcal{A}\leftarrow\mathcal{A}-\left\{ \widetilde{j}\right\}. \]</span></p></li>
 </ol>
+<p>Los conjunto activos <span class="math inline">\(\mathcal{A}\)</span> crecen de manera monótona a medida que el algoritmo LARS original progresa, pero la modificación Lasso permite que <span class="math inline">\(\mathcal{A}\)</span> también disminuya. ‘’Uno a la vez’’ significa que los incrementos y decrementos nunca involucran más de un único índice <span class="math inline">\(j\)</span>. Este es el caso usual para datos cuantitativos y siempre puede lograrse añadiendo una pequeña perturbación a los valores de <span class="math inline">\(y\)</span>.</p>
 <p>Tenemos el siguiente resultado:</p>
 <div id="thm-lasso" class="border rounded shadow-sm p-3 mb-3 theorem">
-<p><span class="theorem-title"><strong>Teorema 3.1 (Modificación LARS-LASSO)</strong></span> Bajo la modificación LASSO, y suponiendo la condición de “uno a la vez”, el algoritmo LARS produce todas las soluciones LASSO.</p>
+<p><span class="theorem-title"><strong>Teorema 3.2 (Modificación LARS-LASSO)</strong></span> Bajo la modificación LASSO, y suponiendo la condición de “uno a la vez”, el algoritmo LARS produce todas las soluciones LASSO.</p>
 </div>
-<p>Los conjunto activos <span class="math inline">\(\mathcal{A}\)</span> crecen de manera monótona a medida que el algoritmo LARS original progresa, pero la modificación Lasso permite que <span class="math inline">\(\mathcal{A}\)</span> también disminuya. ‘’Uno a la vez’’ significa que los incrementos y decrementos nunca involucran más de un único índice <span class="math inline">\(j\)</span>. Este es el caso usual para datos cuantitativos y siempre puede lograrse añadiendo una pequeña perturbación a los valores de <span class="math inline">\(y\)</span>.</p>
+</section>
+<section id="la-relación-lars-stagewise" class="level2" data-number="3.2">
+<h2 data-number="3.2" class="anchored" data-anchor-id="la-relación-lars-stagewise"><span class="header-section-number">3.2</span> La relación LARS-Stagewise</h2>
+<p>Supongamos que la regresión por etapas da <span class="math inline">\(N\)</span> pasos de tamaño <span class="math inline">\(\varepsilon\)</span>. Sea <span class="math inline">\(N_{j}\)</span> el numero de veces que se eligió dar un paso en la dirección de la variable <span class="math inline">\(j\)</span> (<span class="math inline">\(N_{j}=0\)</span> para las variables que no están en el conjunto <span class="math inline">\(\mathcal{A}\)</span>).</p>
+<p>Si definimos <span class="math inline">\(P_{j}=\frac{N_{j}}{N}\)</span> (proporción de pasos), la nueva estimación es</p>
+<p><span class="math display">\[ y=\hat{y}_{\mathcal{A}}+N\varepsilon X_{\mathcal{A}}P_{\mathcal{A}} \]</span></p>
+<p>Por otro parte, LARS avanza usando un tamaño de pasos continuos <span class="math inline">\(\gamma\)</span> a lo largo de la dirección equiangular <span class="math inline">\(u_{\mathcal{A}}\)</span></p>
+<p><span class="math display">\[ \hat{y}(\gamma)=\hat{y}_\mathcal{A}+\gamma u_{\mathcal{A}}=\hat{y}_{\mathcal{A}}+\gamma X_{\mathcal{A}}w_{\mathcal{A}} \]</span></p>
+<p>donde <span class="math inline">\(w_{\mathcal{A}}=k_{\mathcal{A}}\left( X_{\mathcal{A}}^{\top}X_{\mathcal{A}} \right)^{-1}1_{\mathcal{|A|}}\)</span>. Note que las estructuras de ambas es parecida, excepto que las entradas de <span class="math inline">\((P_{\mathcal{A}})_{j}\geq0\)</span> y pudiese ocurrir que <span class="math inline">\((w_\mathcal{A})_j&lt;0\)</span> .</p>
+<p>Esta restricción de “solo proporciones positivas” define un espacio permitido (cono convexo) <span class="math inline">\(\mathcal{C}_{\mathcal{A}}\)</span>:</p>
+<p><span class="math display">\[ \mathcal{C}_{\mathcal{A}}=\left\{ v=\sum_{j\in \mathcal{A}}s_{j}x_{j}P_{j}, \quad P_{j}&gt;0\right\} \]</span></p>
+<p>Si <span class="math inline">\((w_{\mathcal{A}})_{j}&lt;0\)</span> para algún <span class="math inline">\(j\)</span>, entonces geometricamente el vector <span class="math inline">\(u_{\mathcal{A}}\)</span> de LARS apunta hacia una zona fuera del cono.</p>
+<p>Para obligar a LARS a generar las estimaciones de regresión por etapas, se usa lo siguiente:</p>
+<ol type="1">
+<li>Calculamos <span class="math inline">\(w_{\mathcal{A}}\)</span>. Si <span class="math inline">\((w_{\mathcal{A}})\geq 0\)</span> para toda <span class="math inline">\(j\)</span>, entonces LARS avanza de manera normal.</li>
+<li>Si existe alguna entrada negativa en <span class="math inline">\(w_{\mathcal{A}}\)</span>, se reemplaza la dirección <span class="math inline">\(u_{\mathcal{A}}\)</span> por su proyección ortogonal hacia el interior del cono permitido <span class="math inline">\(\mathcal{C}_{\mathcal{A}}\)</span>. Llamamos es esta nueva dirección <span class="math inline">\(u_{\mathcal{\hat{B}}}\)</span>. Al proyectarse contra los limites del cono, los <span class="math inline">\((w_{\mathcal{A}})_{j}\)</span> negativos se hacen cero.</li>
+</ol>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="stagelasso.jpeg" class="img-fluid figure-img"></p>
+<figcaption>Geometría de la modificación Stage-LASSO</figcaption>
+</figure>
+</div>
+<p>Tenemos el siguiente resultado:</p>
+<div id="thm-stage" class="theorem">
+<p><span class="theorem-title"><strong>Teorema 3.3 (Lema)</strong></span> Bajo la modificación anterior, el algoritmo LARS produce todas las soluciones de la regresión por etapas.</p>
+</div>
 
 
 </section>
