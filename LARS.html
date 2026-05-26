@@ -234,7 +234,7 @@ window.Quarto = {
 <section id="intuición-detrás-de-lars" class="level2" data-number="2.1">
 <h2 data-number="2.1" class="anchored" data-anchor-id="intuición-detrás-de-lars"><span class="header-section-number">2.1</span> Intuición detrás de LARS</h2>
 <p>Notemos que la regresión por pasos tiene la ventaja de que llega a una solución en a lo más <span class="math inline">\(\min\{n,p\}\)</span> pasos, pero como mencionamos antes, como añadimos “mucho” de un predictor en cada iteración, podemos, sin darnos cuenta, eliminar alguno que fuera relevante. El algoritmo regresión por etapas intenta resolver este problema, pero al costo de introducir muchas iteraciones. El objetivo de el algoritmo de regresión por menor ángulo es obtener los beneficios de ambos realizando decisiones “inteligente” de que predictores añadimos en cada paso y “cuanto” añadimos de cada uno.</p>
-<p>Al igual que en los dos algoritmos anteriores, la idea es añadir predictores hasta que estemos satisfechos. Tomemos primero el caso donde</p>
+<p>En este caso, al igual que en el caso de regresión por pasos, la idea es ir añadiendo predictores y a la vez ir actualizando nuestra estimación <span class="math inline">\(\hat y\)</span>. Consideremos primero el caso donde</p>
 <p><span class="math display">\[
 X=\begin{bmatrix}
 x_{1,1}&amp;x_{1,2}\\
@@ -312,7 +312,7 @@ c_j(\gamma)=x_j^T(y-\hat y_\mathcal A -\gamma u_\mathcal A)=c_j-\gamma\langle x_
 <p><span id="eq-clave"><span class="math display">\[
 |c_j(\gamma)|=|s_j \hat C-\gamma s_jk_{\mathcal A}|= \hat C-\gamma k_{\mathcal A},
 \tag{2.3}\]</span></span></p>
-<p>para <span class="math inline">\(\gamma\leq \frac{\hat C}{k_\mathcal A}\)</span>. La ecuación anterior es la clave para el algortimo funcione, esta nos dice que para valores pequeños de <span class="math inline">\(\gamma\)</span>, <span class="math inline">\(|c_j(\gamma)|\)</span> decrece de manera lineal para <span class="math inline">\(j\in \mathcal A\)</span>. Además, para <span class="math inline">\(j\notin \mathcal A\)</span>, si <span class="math inline">\(c_j\geq 0\)</span> y <span class="math inline">\(\gamma\leq \frac{c_j}{k_\mathcal A}\)</span>, entonces</p>
+<p>para <span class="math inline">\(\gamma\leq \frac{\hat C}{k_\mathcal A}\)</span>. La ecuación anterior es la clave para el algoritmo funcione, esta nos dice que para valores pequeños de <span class="math inline">\(\gamma\)</span>, <span class="math inline">\(|c_j(\gamma)|\)</span> decrece de manera lineal para <span class="math inline">\(j\in \mathcal A\)</span>. Además, para <span class="math inline">\(j\notin \mathcal A\)</span>, si <span class="math inline">\(c_j\geq 0\)</span> y <span class="math inline">\(\gamma\leq \frac{c_j}{k_\mathcal A}\)</span>, entonces</p>
 <p><span class="math display">\[
 |c_j(\gamma)|=c_j-\gamma k_{\mathcal A}\leq \hat C-\gamma k_{\mathcal A},
 \]</span></p>
@@ -365,7 +365,7 @@ Figura&nbsp;2.2: Correlaciones de las variables en A vs correlaciones de las var
 </section>
 <section id="con-qué-subconjunto-nos-quedamos" class="level2" data-number="2.3">
 <h2 data-number="2.3" class="anchored" data-anchor-id="con-qué-subconjunto-nos-quedamos"><span class="header-section-number">2.3</span> Con qué subconjunto nos quedamos?</h2>
-<p>Si <span class="math inline">\(n&lt;p\)</span> nuestro algoritmo se detiene cuando ha añadido <span class="math inline">\(n\)</span> variables. Sin embargo, cuando <span class="math inline">\(p\geq n\)</span> nuestro lagoritmo no se detiene hasta añadir todas las variables. Veamos ahora un criterio que nos ayuda a elegir un subconjunto apropiado de variables para nuestro modelos.</p>
+<p>Si <span class="math inline">\(n&lt;p\)</span> nuestro algoritmo se detiene cuando ha añadido <span class="math inline">\(n\)</span> variables. Sin embargo, cuando <span class="math inline">\(p\geq n\)</span> nuestro algoritmo no se detiene hasta añadir todas las variables. Veamos ahora un criterio que nos ayuda a elegir un subconjunto apropiado de variables para nuestro modelos.</p>
 <div id="def-Cp" class="theorem definition">
 <p><span class="theorem-title"><strong>Definición 2.2 (Estadístico <span class="math inline">\(C_p\)</span>)</strong></span> Para el modelo de regresión lineal usual <a href="intro.html#eq-modelo" class="quarto-xref">Ecuación&nbsp;<span>1.1</span></a>, si <span class="math inline">\(\mu=X\beta\)</span> es el vector de medias de <span class="math inline">\(y\)</span>, definimos para un ajuste <span class="math inline">\(\hat y\)</span> el estadístico,</p>
 <p><span class="math display">\[
