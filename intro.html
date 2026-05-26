@@ -241,7 +241,7 @@ y= X\beta+\varepsilon,\quad \varepsilon \sim N_p(0,\sigma^2I),
 </section>
 <section id="regresión-por-pasos" class="level2" data-number="1.2">
 <h2 data-number="1.2" class="anchored" data-anchor-id="regresión-por-pasos"><span class="header-section-number">1.2</span> Regresión por pasos</h2>
-<p>La idea de este algortimo es ir construyendo el modelo sucesivamente, añadiendo predictores hasta que estemos satisfechos. La corrlación entre <span class="math inline">\(x_i\)</span> y un residual <span class="math inline">\(y-\hat y\)</span> está dada por</p>
+<p>La idea de este algortimo es ir construyendo el modelo sucesivamente, añadiendo predictores hasta que estemos satisfechos y actualizando nuestra estimación <span class="math inline">\(\hat y\)</span> en cada iteración. La corrlación entre <span class="math inline">\(x_i\)</span> y un residual <span class="math inline">\(y-\hat y\)</span> está dada por</p>
 <p><span id="eq-corr"><span class="math display">\[
 \frac{\sum_{j=1}^n (x_{i,j}-\overline{x_i})(y_j-\hat y_j-\overline y+\overline{\hat y}  )}{\sqrt{\sum_{j=1}^n(x_{i,j}-\overline{x_i})^2}\sqrt{\sum_{j=1}^n(y_j-\hat y_j-\overline{y}+\overline{\hat y})^2}}=\frac{\langle x_i,y -\hat y\rangle}{||y-\hat y||}\propto \langle x_i,y-\hat y\rangle.
 \tag{1.2}\]</span></span> Entonces, para encontrar el predictor más correlacionado con <span class="math inline">\(y\)</span> suponiendo que tenemos una estimacion <span class="math inline">\(\hat y\)</span> , únicamente tenemos que calcular el vector de correlaciones parciales</p>
@@ -257,11 +257,43 @@ c=X^T(y-\hat y).
 </section>
 <section id="regresión-por-etapas" class="level2" data-number="1.3">
 <h2 data-number="1.3" class="anchored" data-anchor-id="regresión-por-etapas"><span class="header-section-number">1.3</span> Regresión por etapas</h2>
-<p>Notemos que este algortimo tiene una desventaja, si bien se llega a la solución en muy pocas iteraciones y tomamos la decisión óptima en cada paso del algoritmo, no tenemos en cuenta la optimalidad del algoritmo como un todo. Un intento de remediar este problema es la regresión por etapas. En nuestro algoritmo <a href="#eq-step" class="quarto-xref">Ecuación&nbsp;<span>1.4</span></a>, simplemente reemplazamos el término que añadimos por un <span class="math inline">\(\varepsilon&gt;0\)</span> suficientemente pequeño</p>
-<p><span id="eq-stage"><span class="math display">\[
-\hat j =\arg\max \{|X^T(y-\hat y)|\},\quad \hat y \longleftarrow \hat y+\varepsilon\cdot\text{sign}(c_{\hat j}) x_{\hat j}.
+<p>Notemos que el algortimo por pasos tiene una desventaja, si bien se llega a la solución en muy pocas iteraciones y tomamos la decisión óptima en cada paso del algoritmo, no tenemos en cuenta la optimalidad del algoritmo como un todo. Consideremos el siguiente escenario: supongamos que en algún momento del algoritmo añadimos la variable <span class="math inline">\(x_j\)</span>. Entonces, en el siguiente paso se tiene que</p>
+<p><span id="eq-regpasitos"><span class="math display">\[
+x_j^Ty=x_j^T\hat y \Rightarrow x_j^T(y-\hat y)=0.
 \tag{1.5}\]</span></span></p>
-<p>Con esto, logramos construir la solución con incrementos más pequeños hasta que otra variable tenga mayor correlación con el residual, de modo que logramos detectar cuando este cambio ocurre (hasta un error tan pequeño como queramos). De nuevo, podemos parar el algoritmo utilizando por ejemplo una prueba <span class="math inline">\(F\)</span>.</p>
+<p>Así, si hay una variable que esté correlacionada con <span class="math inline">\(x_j\)</span>, el algoritmo la olvida, incluso si antes de incluir a <span class="math inline">\(x_j\)</span> su correlación parcial era alta.</p>
+<p>Un intento de remediar este problema es la regresión por etapas. Notemos que en el algoritmo anterior, añadimos una variable a nuestro modelo y todo el “peso” de esta variable, en el sentido de que la estimación <span class="math inline">\(\hat y\)</span> se actualiza al estimador de mínimos cuadrados, de manera que como observamos en <a href="#eq-regpasitos" class="quarto-xref">Ecuación&nbsp;<span>1.5</span></a> su correlación parcial será 0 siempre. El algoritmo de regresión por etapas permite añadir un poco de una variable en cada iteración, sin añadirla completamente al modelo. En este caso, lo que hacemos es ir construyendo la estimación <span class="math inline">\(\hat y\)</span> iterativamente.</p>
+<p>Para hacer esto, fijamos <span class="math inline">\(\varepsilon&gt;0\)</span> pequeño. Luego, hacemos lo siguiente iterativamente:</p>
+<ul>
+<li><p>Calculamos el vector de correlaciones parciales <a href="#eq-corrpa" class="quarto-xref">Ecuación&nbsp;<span>1.3</span></a> <span class="math inline">\(c\)</span> .</p></li>
+<li><p>Elegimos <span class="math inline">\(\hat j=\arg\max\{|c_j|\}\)</span>.</p></li>
+<li><p>Actualizamos <span class="math inline">\(\hat y=\hat y +\varepsilon\cdot \text{sign}(c_{\hat j})\cdot x_{\hat j}\)</span>.</p></li>
+</ul>
+<p>Nuestro algoritmo se detiene cuando hemos llegado a la solución de mínimos cuadrados usual. Con esto, logramos construir la solución con incrementos más pequeños hasta que otra variable tenga mayor correlación con el residual, de modo que logramos detectar cuando este cambio ocurre (hasta un error tan pequeño como queramos).</p>
+<p>Para ejemplificar gráficamente lo que hace este algoritmo, consideremos el caso donde <span class="math display">\[
+X=\begin{bmatrix}
+x_{1,1}&amp;x_{1,2}\\
+x_{2,1}&amp;x_{2,2}
+\end{bmatrix}.
+\]</span></p>
+<p>Supongamos que <span class="math inline">\(|\langle x_1,y\rangle|&gt;|\langle x_2,y\rangle|\)</span>. Entonces, nuestra estimación se actualiza a <span class="math inline">\(\hat y=\hat y +\varepsilon\cdot \text{sign}(c_1)\cdot x_1\)</span>. Ahora bien, notemos que si <span class="math inline">\(\varepsilon &lt;|c_1|\)</span>, entonces</p>
+<p><span class="math display">\[
+|x_1^T(y-\hat y-\varepsilon \cdot \text{sign}(c_1)\cdot x_1)|=|c_1-\text{sign}(c_1)\cdot \varepsilon|&lt;|c_1|,
+\]</span>y también,</p>
+<p><span class="math display">\[
+|x_2^T(y-\hat y-\varepsilon\cdot\text{sign}(c_1) \cdot x_1) |=| c_2-\text{sign}(c_1)\cdot\varepsilon \cdot x_2^Tx_1|&lt; |c_1-\text{sign}(c_1)\cdot \varepsilon|,
+\]</span></p>
+<p>pues recordemos que cada entrada de <span class="math inline">\(X\)</span> es menor en valor absoluto que 1. Entonces, a medida que iteramos, la correlación parcial de <span class="math inline">\(x_1\)</span> decrece y lo hace más rápido que la de <span class="math inline">\(x_2\)</span>. Por esto, en algún punto la correlación parcial de <span class="math inline">\(x_2\)</span> será mayor que la de <span class="math inline">\(x_1\)</span> y comenzaremos a agregar incrementos de la forma <span class="math inline">\(\hat y=\hat y =\varepsilon \cdot \text{sign}(c_2)\cdot x_2\)</span> y este patrón se repite formando un efecto de escalera como se ve en la siguiente imagen:</p>
+<div id="fig-regetapas" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-regetapas-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="regetapas2.png" class="img-fluid quarto-figure quarto-figure-center figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-regetapas-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figura&nbsp;1.1: Representación gráfica de regresión por etapas en dos dimensiones con 2 covariables.
+</figcaption>
+</figure>
+</div>
 <p>Tenemos el siguiente código que representa este algoritmo:</p>
 <div class="callout callout-style-simple callout-note no-icon callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -325,22 +357,7 @@ Ejemplo
 </div>
 </div>
 </div>
-<p>Ahora bien, con los mismos datos, realicemos la regresión Lasso y tenemos los siguientes caminos para <span class="math inline">\(\beta\)</span>.</p>
-<div class="cell">
-<details class="code-fold">
-<summary>Código</summary>
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(glmnet)</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>out  <span class="ot">&lt;-</span> <span class="fu">glmnet</span>(X,y)  </span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(out)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="intro_files/figure-html/unnamed-chunk-1-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-</div>
+<pre><code></code></pre>
 </div>
 </div>
 <p>La desventaja clara es que en este caso, el número de iteraciones necesarias para alcanzar el resultado se dispara. Ahora bien, notemos que si corremos el código de LASSO obtenemos unos caminos muy similares a los obtenidos con la regresión por etapas. Esto nos indica que podría haber una conexión entre estos dos algoritmos.</p>

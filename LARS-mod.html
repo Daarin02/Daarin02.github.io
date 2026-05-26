@@ -201,7 +201,7 @@ window.Quarto = {
 <p>La regresión Lasso estima los coeficientes minimizando <span class="math inline">\(\left\| Y-X\beta\right\|^{2},\)</span> sujeta a <span class="math inline">\(\left\| \beta\right\|_1=\sum_{j=1}^{k}|\beta_{j}|\leq t, t&gt;0\)</span> .</p>
 <p>Al derivar esta expresión respecto a un coeficiente <span class="math inline">\(\beta_{j}\neq 0\)</span> e igualar a cero para encontrar el mínimo se llega a la condición <span class="math inline">\(-c_{j}+\alpha \text{ sign}(\beta_{j})=0\)</span> . Como <span class="math inline">\(\alpha&gt;0\)</span>, entonces para que la condición anterior se cumpla se necesita que el signo del coeficiente está matemáticamente obligado a coincidir con el signo de su correlación. Esto nos da una condición para LARS:</p>
 <div id="thm-sollasso" class="theorem">
-<p><span class="theorem-title"><strong>Teorema 3.1 (Lema)</strong></span> Sea <span class="math inline">\(\hat \beta\)</span> una solución LASSO. Entonces, para cualquier coeficiente no nulo se debe cumplir que <span class="math inline">\(\text{sign}(\hat\beta_j)=\text{sign}(c_j)=s_j\)</span></p>
+<p><span class="theorem-title"><strong>Teorema 3.1 (Soluciones LASSO)</strong></span> Sea <span class="math inline">\(\hat \beta\)</span> una solución LASSO. Entonces, para cualquier coeficiente no nulo se debe cumplir que <span class="math inline">\(\text{sign}(\hat\beta_j)=\text{sign}(c_j)=s_j\)</span></p>
 </div>
 <p>Supongamos que el algoritmo se encuentra en una etapa dada con un conjunto activo <span class="math inline">\(\mathcal{A}\)</span> y una estimación actual <span class="math inline">\(\hat{\beta}\)</span>. La iteracion del algoritmo modificado procede de la siguiente manera:</p>
 <ol type="1">
