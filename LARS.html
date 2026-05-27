@@ -54,7 +54,27 @@ div.sourceCode
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-</style>
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
 
 
 <script src="site_libs/quarto-nav/quarto-nav.js"></script>
@@ -191,6 +211,12 @@ window.Quarto = {
   <div class="sidebar-item-container"> 
   <a href="./LARS-mod.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Modificaciones del algoritmo LARS.</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./References.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Referencias</span></a>
   </div>
 </li>
     </ul>
@@ -379,7 +405,7 @@ C_p(\hat y)=\mathbb E\left[\frac{||\hat y-\mu||^2}{\sigma^2}\right],
 <p><span class="math display">\[
 C_p(\hat y)=\mathbb E\left[\frac{||y-\hat y||^2}{\sigma^2}\right]-n+2\sum_{i=1}^n\frac{\text{Cov}(\hat y_i,y_i)}{\sigma^2}.
 \]</span></p>
-<p>Usualmente no conocemos la varianza, por lo que podemos reemplazar lo anterior con su estimador insesgado del modelo completo. Más aún, se puede probar que bajo ciertas condiciones se tiene que</p>
+<p>Usualmente no conocemos la varianza, por lo que podemos reemplazar lo anterior con su estimador insesgado del modelo completo. Más aún, se puede probar (ver <span class="citation" data-cites="Brad04">I. J. Bradley Efron Trevor Hastie (<a href="References.html#ref-Brad04" role="doc-biblioref">2004</a>)</span>) que bajo ciertas condiciones se tiene que</p>
 <p><span class="math display">\[
 C_p(\hat y_k)=\mathbb E\left[\frac{||y-\hat y_k||^2}{\hat\sigma^2}\right]-n+2k,
 \]</span>donde <span class="math inline">\(\hat y_k\)</span> es el estimador en el <span class="math inline">\(k\)</span>-ésimo paso de nuestro algoritmo, y aunque no se tenga la igualdad, esta es una buena aproximación para el estimador. Nos interesa entonces encontrar el paso de nuestro algoritmo donde se minimice este estadístico.</p>
@@ -395,7 +421,7 @@ Ejemplo
 </div>
 <div id="callout-2" class="callout-2-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-<p>Consideremos de nuevo nuestra base de datos de diabetes. Al realizar la regresión obtenemos los siguientes caminos para <span class="math inline">\(\beta\)</span>.</p>
+<p>Consideremos de nuevo nuestra base de datos de diabetes. Al realizar la regresión utilizando el paquete Lars (<span class="citation" data-cites="Rpack">T. H. Bradley Efron (<a href="References.html#ref-Rpack" role="doc-biblioref">2022</a>)</span>) obtenemos los siguientes caminos para <span class="math inline">\(\beta\)</span>.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Código</summary>
@@ -441,6 +467,14 @@ Ejemplo
 </div>
 
 
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list" style="display: none">
+<div id="ref-Brad04" class="csl-entry" role="listitem">
+Bradley Efron, Iain Johnstone, Trevor Hastie. 2004. <span>«Least angle regression»</span>. <em>Comput. J.</em> 32 (2): 407-99. <a href="https://doi.org/10.1214/009053604000000067">https://doi.org/10.1214/009053604000000067</a>.
+</div>
+<div id="ref-Rpack" class="csl-entry" role="listitem">
+Bradley Efron, Trevor Hastie. 2022. <span>«Lars: Least Angle Regression, Lasso and Forward Stagewise»</span>. <a href="https://cran.r-project.org/web/packages/lars/index.html">https://cran.r-project.org/web/packages/lars/index.html</a>.
+</div>
+</div>
 </section>
 
 </main> <!-- /main -->
