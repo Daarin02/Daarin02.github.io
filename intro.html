@@ -283,7 +283,7 @@ x_{2,1}&amp;x_{2,2}
 <p><span class="math display">\[
 |x_2^T(y-\hat y-\varepsilon\cdot\text{sign}(c_1) \cdot x_1) |=| c_2-\text{sign}(c_1)\cdot\varepsilon \cdot x_2^Tx_1|&lt; |c_1-\text{sign}(c_1)\cdot \varepsilon|,
 \]</span></p>
-<p>pues recordemos que cada entrada de <span class="math inline">\(X\)</span> es menor en valor absoluto que 1. Entonces, a medida que iteramos, la correlación parcial de <span class="math inline">\(x_1\)</span> decrece y lo hace más rápido que la de <span class="math inline">\(x_2\)</span>. Por esto, en algún punto la correlación parcial de <span class="math inline">\(x_2\)</span> será mayor que la de <span class="math inline">\(x_1\)</span> y comenzaremos a agregar incrementos de la forma <span class="math inline">\(\hat y=\hat y =\varepsilon \cdot \text{sign}(c_2)\cdot x_2\)</span> y este patrón se repite formando un efecto de escalera como se ve en la siguiente imagen:</p>
+<p>pues recordemos que cada entrada de <span class="math inline">\(X\)</span> es menor en valor absoluto que 1. Entonces, a medida que iteramos, la correlación parcial de <span class="math inline">\(x_1\)</span> decrece y lo hace más rápido que la de <span class="math inline">\(x_2\)</span>. Por esto, en algún punto la correlación parcial de <span class="math inline">\(x_2\)</span> será mayor que la de <span class="math inline">\(x_1\)</span> y comenzaremos a agregar incrementos de la forma <span class="math inline">\(\hat y=\hat y +\varepsilon \cdot \text{sign}(c_2)\cdot x_2\)</span> y este patrón se repite formando un efecto de escalera como se ve en la siguiente imagen:</p>
 <div id="fig-regetapas" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-regetapas-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
@@ -360,7 +360,7 @@ Ejemplo
 <pre><code></code></pre>
 </div>
 </div>
-<p>La desventaja clara es que en este caso, el número de iteraciones necesarias para alcanzar el resultado se dispara. Ahora bien, notemos que si corremos el código de LASSO obtenemos unos caminos muy similares a los obtenidos con la regresión por etapas. Esto nos indica que podría haber una conexión entre estos dos algoritmos.</p>
+<p>La desventaja clara es que en este caso, el número de iteraciones necesarias para alcanzar el resultado se dispara.</p>
 
 
 </section>

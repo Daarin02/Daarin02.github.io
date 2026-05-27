@@ -351,12 +351,12 @@ Figura&nbsp;2.2: Correlaciones de las variables en A vs correlaciones de las var
 <p><span class="math display">\[
 \mathcal A\longleftarrow \mathcal A\cup\{\hat j\},\quad \hat C\longleftarrow  \hat C-\hat\gamma k_{\mathcal A},\quad \hat y_{\mathcal A}\longleftarrow \hat y_\mathcal A+\hat\gamma u_\mathcal A,
 \]</span>donde <span class="math inline">\(\hat j\)</span> es el <span class="math inline">\(\arg\min\)</span> en la <a href="#eq-gammareal" class="quarto-xref">Ecuación&nbsp;<span>2.5</span></a>.</p>
-<p>Lo anterior está bien definido para cada etapa del algoritmo salvo en el último paso, pues al final <span class="math inline">\(\mathcal A^c=\varnothing\)</span>. El objetivo final del algoritmo es recuperar la solución de mínimos cuadrados. Supongamos que tenemos la estimación actual <span class="math inline">\(\hat y_\mathcal A\)</span> y sea <span class="math inline">\(\overline y_\mathcal A\)</span> la solución de mínimos cuadrados actual. Entonces,</p>
+<p>Lo anterior está bien definido para cada etapa del algoritmo salvo en el último paso, pues al final <span class="math inline">\(\mathcal A^c=\varnothing\)</span>. El objetivo final del algoritmo es recuperar la solución de mínimos cuadrados. Supongamos que tenemos la estimación actual <span class="math inline">\(\hat y_\mathcal A\)</span> y sea <span class="math inline">\(\tilde y_\mathcal A\)</span> la solución de mínimos cuadrados actual. Entonces,</p>
 <p><span class="math display">\[
-\overline y_\mathcal A=\hat y_\mathcal A+X_\mathcal A(X_\mathcal A^TX_\mathcal A)^{-1}X_\mathcal A^T(y-\hat y_\mathcal A)=\hat y_\mathcal A+\frac{\hat C_\mathcal A}{k_\mathcal A}u_\mathcal A,
+\tilde y_\mathcal A=\hat y_\mathcal A+X_\mathcal A(X_\mathcal A^TX_\mathcal A)^{-1}X_\mathcal A^T(y-\hat y_\mathcal A)=\hat y_\mathcal A+\frac{\hat C_\mathcal A}{k_\mathcal A}u_\mathcal A,
 \]</span>pues <span class="math inline">\(\hat y_\mathcal A\)</span> por construcción está en el espacio generado por los vectores <span class="math inline">\(\{x_i\}_{i\in \mathcal A}\)</span> y recordando la <a href="#eq-ua" class="quarto-xref">Ecuación&nbsp;<span>2.1</span></a>. Como <span class="math inline">\(u_\mathcal A\)</span> es unitario, se cumple que</p>
 <p><span class="math display">\[
-||\hat y_\mathcal A-\overline y_\mathcal A||=\frac{\hat C_\mathcal A}{k_\mathcal A},
+||\hat y_\mathcal A-\tilde y_\mathcal A||=\frac{\hat C_\mathcal A}{k_\mathcal A},
 \]</span>entonces nunca llegamos a la solución de mínimos cuadrados, y si queremos llegar a ella al final, requerimos que en la última iteración,</p>
 <p><span class="math display">\[
 \hat\gamma=\frac{\hat C_\mathcal A}{k_\mathcal A},\quad \mathcal A=\{1,\dots, \min\{n,p\}\}.
@@ -421,7 +421,7 @@ Ejemplo
 </div>
 </div>
 </div>
-<p>Podemos ver de nuevo que los caminos de <span class="math inline">\(\beta\)</span> obtenidos son muy similares a los de Lasso y regresión por etapas. Ahora bien, también tenemos la siguiente gráfica para los estadísticos <span class="math inline">\(C_p\)</span>.</p>
+<p>Ahora bien, también tenemos la siguiente gráfica para los estadísticos <span class="math inline">\(C_p\)</span>.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Código</summary>
